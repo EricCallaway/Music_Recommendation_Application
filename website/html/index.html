@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music Recommendation App</title>
+
+  <link rel="stylesheet" href="../css/login-page.css">
+  <link rel="stylesheet" href="../css/side-navbar.css">
+
+  <script defer src="../js/login-page.js"></script>
+
+  <script src="https://kit.fontawesome.com/a52a6f742b.js" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="../js/component.js" defer></script>
+  
+</head>
+
+<body>
+    <side-navbar></side-navbar>
+
+
+  <main id="main-holder">
+    <h1 id="login-header">Login</h1>
+    
+    
+    <form id="login-form">
+        <input type="text" name="username" id="username-field" class="login-form-field" placeholder="Username">
+        <input type="password" name="password" id="password-field" class="login-form-field" placeholder="Password">
+        <input type="submit" value="Login" id="login-form-submit">
+    </form>
+    
+    <div id="login-error-msg-holder">
+      <p id="login-error-msg">Invalid username <span id="error-msg-second-line">and/or password</span></p>
+    </div>
+
+  </main>
+</body>
+
+</html>

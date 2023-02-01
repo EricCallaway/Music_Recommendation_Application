@@ -9,7 +9,7 @@ loginButton.addEventListener("click", (e) => {
 
     if (username === "user" && password === "user") {
         // alert("You have successfully logged in.");
-        window.location.href = "/Users/ericcallaway/Google Drive/School Work/Spring 2023/Final_Year_Project/Music_Recommnedation_Application/website/main.html"
+        window.location.href = "../html/home.html"
     } else {
         loginErrorMsg.style.opacity = 1;
     }

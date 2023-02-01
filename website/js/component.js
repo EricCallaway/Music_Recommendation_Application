@@ -1,22 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
+class SideNavbar extends HTMLElement{
+    constructor(){
+        super();
+    }
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Music Recommendation App</title>
-  <link rel="stylesheet" href="login-page.css">
-  <script defer src="login-page.js"></script>
-  <script src="https://kit.fontawesome.com/a52a6f742b.js" crossorigin="anonymous"></script>
-</head>
-
-<body>
-    <div class="wrapper">
+    connectedCallback(){
+        this.innerHTML = `<div class="wrapper">
         <!--Top menu-->
         <div class="sidebar">
             <!--Profile Image & text-->
             <div class="logo">
-                <img src="imgs/music_clip_art.png" alt="music_logo">
+                <img src="../imgs/music_clip_art.png" alt="music_logo">
                 <h3>Eric Callaway's</h3>
                 <p>Music Recommendation Application</p>
             </div>
@@ -56,22 +49,8 @@
                 </ul>
             </div>
         </div>
-    </div>
-  <main id="main-holder">
-    <h1 id="login-header">Login</h1>
-    
-    
-    <form id="login-form">
-        <input type="text" name="username" id="username-field" class="login-form-field" placeholder="Username">
-        <input type="password" name="password" id="password-field" class="login-form-field" placeholder="Password">
-        <input type="submit" value="Login" id="login-form-submit">
-    </form>
-    
-    <div id="login-error-msg-holder">
-      <p id="login-error-msg">Invalid username <span id="error-msg-second-line">and/or password</span></p>
-    </div>
+    </div>`
+    }
+}
 
-  </main>
-</body>
-
-</html>
+customElements.define('side-navbar', SideNavbar)
