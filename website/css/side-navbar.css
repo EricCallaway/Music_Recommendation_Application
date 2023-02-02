@@ -7,6 +7,7 @@
     height: 100%;
     padding: 20px 0;
     transition: all 0.5s ease;
+    overflow-y: scroll;
   }
 
   .wrapper .sidebar .logo{
@@ -68,3 +69,10 @@
     align-items: center;
     padding: 0 30px;
   }
+
+  .menu-container {
+    height: 300px;
+    overflow-y: scroll;
+  }
+
+  

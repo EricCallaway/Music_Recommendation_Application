@@ -16,18 +16,60 @@
         <side-navbar></side-navbar>
     </div>
     <main id="main-holder">
-        <h1>Muscic Recommendation System</h1>  
+        <h1>Music Recommendation System App</h1>  
         <h2>Select Your Preference</h2>
+        <p>Feature</p>
         <form id="feature-selection">
-            <input type="radio" id="feature-selection-song" value="Song">
+            <input type="radio" id="feature-selection-song" value="Song" name="selection">
             <label for="feature-selection-song">Song</label><br>
 
-            <input type="radio" id="featire-selection-playlist" value="Playlist">
-            <lable for="featire-selection-playlist">Playlist</lable><br>
+            <input type="radio" id="feature-selection-playlist" value="Playlist" name="selection"s>
+            <lable for="feature-selection-playlist">Playlist</lable><br>
         </form>
+        <br>
 
-        <h2>User Playlist</h2>
-        <p>Testing</p>
+        <p id="song" style="display: block;">Song URI</p>
+        <p id="playlist" style="display: none;">Playlist URI</p>
+
+        
+        <br>
+        <input type="text" id="URI-input" name="URI-input">
+        <br>
+        <br>
+
+        <h2 id="h2-song" style="display: block;">User's Song</h2>
+        <h2 id="h2-playlist" style="display: none;">User Playlist</h2>
+
+        <script>
+          const form = document.getElementById("feature-selection");
+          const song = document.getElementById("song");
+          const playlist = document.getElementById("playlist");
+          const h2_song = document.getElementById("h2-song");
+          const h2_playlist = document.getElementById("h2-playlist");
+        
+          form.addEventListener("change", function() {
+            if (form.elements.selection.value === "Song") {
+              song.style.display = "block";
+              h2_song.style.display = "block";
+
+              playlist.style.display = "none";
+              h2_playlist.style.display = "none";
+            } else if (form.elements.selection.value === "Playlist") {
+              song.style.display = "none";
+              h2_song.style.display = "none";
+
+              playlist.style.display = "block";
+              h2_playlist.style.display = "block";
+            }
+          });
+        </script>
+
+        
+        <hr class="solid">
+
+        <section>
+
+        </section>
         
     </main>
   </body>

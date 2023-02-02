@@ -14,7 +14,7 @@ class SideNavbar extends HTMLElement{
                 <p>Music Recommendation Application</p>
             </div>
             <!--Menu item-->
-            <div>
+            <div class="menu-container">
                 <ul>
                     <li>
                         <a href="#" class="active">
