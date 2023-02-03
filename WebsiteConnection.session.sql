@@ -38,7 +38,8 @@
 -- ADD CONSTRAINT recommended_songs_user_id_foreign
 -- FOREIGN KEY(user_id) REFERENCES user(id);
 
-ALTER TABLE recommended_songs 
-ADD CONSTRAINT recommended_songs_spotify_id_foreign
-FOREIGN KEY(spotify_id) REFERENCES songs(spotify_id);
+-- ALTER TABLE recommended_songs 
+-- ADD CONSTRAINT recommended_songs_spotify_id_foreign
+-- FOREIGN KEY(spotify_id) REFERENCES songs(spotify_id);
 
+SELECT artist, title FROM songs LIMIT 20;
