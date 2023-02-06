@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Songs{% endblock %}
+
+{% block content %}
+    <h1>Songs</h1>
+    <div class="container" id="add_song_button" style="padding-left: 0px">
+        <a href="/new_song">
+            <button class="btn btn-primary">Add New Song</button>
+        </a>
+
+    </div>
+    <br>
+    <table id="data" class="table table-striped">
+        <thread>
+            <th>Song ID</th>
+            <th>Name</th>
+            <th>Artist</th>
+        </thread>
+        <tbody>
+            {% for song in songs.items %}
+                <tr>
+                    <td>{{ song.id }}</td>
+                    <td>{{ song.name }}</td>
+                    <td>{{ song.artist }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+
+    {% for page_num in songs.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+        {% if page_num %}
+            {% if songs.page == page_num %}
+                <a class="btn btn-info mb-4" href="{{ url_for('views.display_songs', page=page_num) }}">{{ page_num }}</a>
+            {% else %}
+                <a class="btn btn-info mb-4" href="{{ url_for('views.display_songs', page=page_num) }}">{{ page_num }}</a>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+
+   
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    $(document).ready(function () {
+      $('#data').DataTable({
+        columns: [
+          null,
+          {searchable: false},
+          {orderable: false, searchable: false},
+          {orderable: false, searchable: false},
+          null],
+      });
+    });
+  </script>
+{% endblock %}

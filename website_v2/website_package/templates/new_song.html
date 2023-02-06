@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Songs{% endblock %}
+
+{% block content %}
+    <form action="/new_song" method="POST">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name">
+
+        <label for="artist">Artist:</label>
+        <input type="text" id="artist" name="artist">
+
+        <input type="submit" value="Submit">
+    </form>
+{% endblock %}
