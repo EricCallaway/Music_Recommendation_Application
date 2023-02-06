@@ -35,16 +35,10 @@ def delete_note():
             db.session.commit()
     return jsonify({})
 
-
-ROWS_PER_PAGE = 5
-#This function will display songs
 @views.route('/songs', methods=['GET', 'POST'])
 def display_songs():
-    page = request.args.get('page', 1, type=int)
-    songs = Song.query.paginate(page=page, per_page=ROWS_PER_PAGE)
-    return render_template('/songs.html', songs=songs, user=current_user)
-
-
+    songs = Song.query
+    return render_template('songs.html', songs=songs, user=current_user)
 
 #This method will allow the user to add new songs
 @views.route('/new_song', methods=['GET', 'POST'])
@@ -57,6 +51,4 @@ def add_song():
         db.session.commit()
         return redirect(url_for('views.display_songs'))
     return render_template('new_song.html', user=current_user)
-
-    
 
