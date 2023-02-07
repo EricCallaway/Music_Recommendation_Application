@@ -43,7 +43,7 @@
 
         $('#song_data tbody').on('click', 'tr', function(){
             var data = $('#song_data').DataTable().row( this ).data();
-            swal("Great Choice!", "You clicked on row " + data.id + " with name " + data.name + " and artist " + data.artist);
+            swal("Great Choice!", "You chose the song " + data.name + " by " + data.artist);
         });
     });
 
