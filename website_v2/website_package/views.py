@@ -52,3 +52,8 @@ def add_song():
         return redirect(url_for('views.display_songs'))
     return render_template('new_song.html', user=current_user)
 
+#This endpoint will return a JSON payload required for the Ajax Data Source
+@views.route('api/data')
+def data():
+    return {'data' : [song.to_dict() for song in Song.query]}
+
