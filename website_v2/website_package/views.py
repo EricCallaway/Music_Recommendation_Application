@@ -55,5 +55,47 @@ def add_song():
 #This endpoint will return a JSON payload required for the Ajax Data Source
 @views.route('api/data')
 def data():
-    return {'data' : [song.to_dict() for song in Song.query]}
+    query = Song.query
 
+    #search filter
+    search = request.args.get('search[value]')
+    if search:
+        query = query.filter(db.or_(
+            Song.name.like(f'%{search}%'),
+            Song.artist.like(f'%{search}%')
+        ))
+
+    total_filtered = query.count()
+
+    #sorting
+    order = []
+    i = 0
+    while True:
+        col_index = request.args.get(f'order[{i}][column]')
+        if col_index is None:
+            break
+        col_name = request.args.get(f'columns[{col_index}][data]')
+        if col_name not in ['id', 'name', 'artist']:
+            col_name = 'name'
+        descending = request.args.get(f'order[{i}][dir]') == 'desc'
+        col = getattr(Song, col_name)
+        if descending:
+            col = col.desc()
+        order.append(col)
+        i += 1
+    
+    if order:
+        query = query.order_by(*order)
+
+    #pagination
+    start = request.args.get('start', type=int)
+    length = request.args.get('length', type=int)
+    query = query.offset(start).limit(length)
+
+    #response
+    return {
+        'data': [song.to_dict() for song in query],
+        'recordsFiltered': total_filtered,
+        'recordsTotal': Song.query.count(),
+        'draw': request.args.get('draw', type=int),
+    }

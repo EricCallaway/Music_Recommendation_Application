@@ -29,6 +29,7 @@
     $(document).ready( function () {
         $('#song_data').DataTable({
             ajax: '/api/data',
+            serverSide: true,
             columns: [
                 {data: 'id'},
                 {data: 'name'},
