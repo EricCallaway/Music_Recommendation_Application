@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
 from flask_login import login_user, login_required, logout_user, current_user
-from .models import Note, Song, User
+from .models import Note, Song, User, Pet
 from . import db 
 import json
 
@@ -54,7 +54,7 @@ def add_song():
 
 #This endpoint will return a JSON payload required for the Ajax Data Source
 @views.route('api/data')
-def data():
+def song_data():
     query = Song.query
 
     #search filter
@@ -99,3 +99,9 @@ def data():
         'recordsTotal': Song.query.count(),
         'draw': request.args.get('draw', type=int),
     }
+
+
+@views.route('/pets', methods = ['GET', 'POST'])
+def show_pet():
+    pets = Pet.query.all()
+    return render_template('pets.html', user=current_user, pets=pets)
