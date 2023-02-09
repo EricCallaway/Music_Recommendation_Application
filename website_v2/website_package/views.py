@@ -69,14 +69,18 @@ def song_data():
 
     #sorting
     order = []
+    cols = [
+        'id', 'track_id', 'track_name', 'track_artist', 'lyrics', 'track_album_id' , 'playlist_name',
+        'playlist_id', 'playlist_genre', 'playlist_subgenre', 'danceability', 'energy' , 'key',
+        'loudness', 'mode', 'speechiness', 'acousticness', 'instrumentallness', 'liveness', 'valence', 'tempo', 'duration_ms', 'language']
     i = 0
     while True:
         col_index = request.args.get(f'order[{i}][column]')
         if col_index is None:
             break
         col_name = request.args.get(f'columns[{col_index}][data]')
-        if col_name not in ['id', 'name', 'artist']:
-            col_name = 'name'
+        if col_name not in cols:
+            col_name = 'track_name'
         descending = request.args.get(f'order[{i}][dir]') == 'desc'
         col = getattr(Song, col_name)
         if descending:

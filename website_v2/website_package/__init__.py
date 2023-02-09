@@ -2,8 +2,10 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_login import LoginManager
+from flask_migrate import Migrate
 
 db = SQLAlchemy()
+migrate = Migrate()
 DB_NAME = "music_app"
 
 """
@@ -16,6 +18,7 @@ def create_app():
     app.config['SECRET_KEY'] = '5uP3rSec#tK3%'
     app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://root:Eric19$$@localhost/{DB_NAME}'
     db.init_app(app)
+    migrate.init_app(app, db)
 
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'
@@ -43,4 +46,6 @@ def create_app():
 def create_database(app):
     if not path.exists('website/' + DB_NAME):
         with app.app_context():
+            print("Creating DB")
+            # db.drop_all()
             db.create_all()

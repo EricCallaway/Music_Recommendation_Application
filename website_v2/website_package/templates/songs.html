@@ -17,8 +17,27 @@
         <thead>
             <tr>
                 <th>Song ID</th>
+                <th>Track ID</th>
                 <th>Name</th>
                 <th>Artist</th>
+                <th>Lyrics</th>
+                <th>Album ID</th>
+                <th>PlayList Name</th>
+                <th>Playlist ID</th>
+                <th>Playlist Genre</th>
+                <th>Playlist Subgenre</th>
+                <th>Danceability</th>
+                <th>Energy</th>
+                <th>Key</th>
+                <th>Mode</th>
+                <th>Speechiness</th>
+                <th>Acousticness</th>
+                <th>Instrumentallness</th>
+                <th>Liveness</th>
+                <th>Valence</th>
+                <th>Tempo</th>
+                <th>Duration (ms)</th>
+                <th>Language</th>
             </tr>
         </thead>
         <tbody>
@@ -35,8 +54,29 @@
             serverSide: true,
             columns: [
                 {data: 'id'},
-                {data: 'name'},
-                {data: 'artist'}
+                {data: 'track_id', visible: false},
+                {data: 'track_name'},
+                {data: 'lyrics', visible: false},
+                {data: 'track_album_id', visible: false},
+                {data: 'track_album_name', visible: false},
+                {data: 'playlist_name', visible: false},
+                {data: 'playlist_id', visible: false},
+                {data: 'playlist_genre', visible: false},
+                {data: 'playlist_subgenre', visible: false},
+                {data: 'danceability', visible: false},
+                {data: 'energy', visible: false},
+                {data: 'key', visible: false},
+                {data: 'loudness', visible: false},
+                {data: 'mode', visible: false},
+                {data: 'speechiness', visible: false},
+                {data: 'acousticness', visible: false},
+                {data: 'instrumentallness', visible: false},
+                {data: 'liveness', visible: false},
+                {data: 'valence', visible: false},
+                {data: 'tempo', visible: false},
+                {data: 'duration_ms', visible: false},
+                {data: 'language', visible: false},
+                
             ],
             dom: 'Bfrtip',
             buttons: ['colvis']
