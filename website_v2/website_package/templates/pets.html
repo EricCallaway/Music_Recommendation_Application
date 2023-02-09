@@ -1,22 +1,45 @@
 {% extends "base.html" %}
+
+
 {% block title %}Pets{% endblock %}
 
 {% block content %}
     <h1>Pets Page</h1>
+    <br>
+
+    <style>
+        tr:hover {background-color:greenyellow}
+    </style>
     
-    <table class="table">
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Age</th>
-        </tr>
+    <table id="pets_table" class="table responsive nowrap" style="width: 100%">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Age</th>
+            </tr>
+        </thead>
         {% for pet in pets %}
-        <tr>
-            <td>{{ pet.id }}</td>
-            <td>{{ pet.name }}</td>
-            <td>{{ pet.age }}</td>
-        </tr>
+        <tbody>
+            <tr>
+                <td>{{ pet.id }}</td>
+                <td>{{ pet.name }}</td>
+                <td>{{ pet.age }}</td>
+            </tr>
+        </tbody>
         {% endfor %}
     </table>
 
 {% endblock %}
+
+{% block scripts %}
+    <script>
+        $(document).ready(function () {
+            $('#pets_table').DataTable({
+                dom: 'Bfrtip',
+                buttons: ['colvis']
+            });
+        });
+    </script>
+{% endblock %}
+    
