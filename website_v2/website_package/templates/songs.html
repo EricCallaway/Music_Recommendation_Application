@@ -39,6 +39,8 @@
                 {data: 'name'},
                 {data: 'artist'}
             ],
+            dom: 'Bfrtip',
+            buttons: ['colvis']
         });
 
         $('#song_data tbody').on('click', 'tr', function(){
@@ -46,8 +48,6 @@
             swal("Great Choice!", "You chose the song " + data.name + " by " + data.artist);
         });
     });
-
-    
 
 </script>
 {% endblock %}
