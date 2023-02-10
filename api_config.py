@@ -4,7 +4,7 @@ import datetime
 import base64
 import json
 from spotipy.oauth2 import SpotifyClientCredentials
-from secret import *
+from utility.secret import *
 
 # with open("secret.txt") as f:
 #     secret_ls = f.readlines()

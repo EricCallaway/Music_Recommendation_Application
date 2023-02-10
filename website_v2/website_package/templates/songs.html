@@ -22,6 +22,7 @@
                 <th>Artist</th>
                 <th>Lyrics</th>
                 <th>Album ID</th>
+                <th>Album Name</th>
                 <th>PlayList Name</th>
                 <th>Playlist ID</th>
                 <th>Playlist Genre</th>
@@ -29,10 +30,11 @@
                 <th>Danceability</th>
                 <th>Energy</th>
                 <th>Key</th>
+                <th>Loudness</th>
                 <th>Mode</th>
                 <th>Speechiness</th>
                 <th>Acousticness</th>
-                <th>Instrumentallness</th>
+                <th>Instrumentalness</th>
                 <th>Liveness</th>
                 <th>Valence</th>
                 <th>Tempo</th>
@@ -56,6 +58,7 @@
                 {data: 'id'},
                 {data: 'track_id', visible: false},
                 {data: 'track_name'},
+                {data: 'track_artist'},
                 {data: 'lyrics', visible: false},
                 {data: 'track_album_id', visible: false},
                 {data: 'track_album_name', visible: false},
@@ -70,7 +73,7 @@
                 {data: 'mode', visible: false},
                 {data: 'speechiness', visible: false},
                 {data: 'acousticness', visible: false},
-                {data: 'instrumentallness', visible: false},
+                {data: 'instrumentalness', visible: false},
                 {data: 'liveness', visible: false},
                 {data: 'valence', visible: false},
                 {data: 'tempo', visible: false},
@@ -84,7 +87,7 @@
 
         $('#song_data tbody').on('click', 'tr', function(){
             var data = $('#song_data').DataTable().row( this ).data();
-            swal("Great Choice!", "You chose the song " + data.name + " by " + data.artist);
+            swal("Great Choice!", "You chose the song " + data.track_name + " by " + data.track_artist);
         });
     });
 

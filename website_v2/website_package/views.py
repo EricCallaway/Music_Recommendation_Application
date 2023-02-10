@@ -72,7 +72,7 @@ def song_data():
     cols = [
         'id', 'track_id', 'track_name', 'track_artist', 'lyrics', 'track_album_id' , 'playlist_name',
         'playlist_id', 'playlist_genre', 'playlist_subgenre', 'danceability', 'energy' , 'key',
-        'loudness', 'mode', 'speechiness', 'acousticness', 'instrumentallness', 'liveness', 'valence', 'tempo', 'duration_ms', 'language']
+        'loudness', 'mode', 'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo', 'duration_ms', 'language']
     i = 0
     while True:
         col_index = request.args.get(f'order[{i}][column]')

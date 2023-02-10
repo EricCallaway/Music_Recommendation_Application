@@ -23,20 +23,20 @@ class Song(db.Model):
     track_name = db.Column(db.String(150), nullable=False)
     track_artist = db.Column(db.String(150), nullable=False)
     lyrics = db.Column(db.Text)
-    track_album_id = db.Column(db.String(150), unique=True, nullable=False)
+    track_album_id = db.Column(db.String(150), unique=False, nullable=False)
     track_album_name = db.Column(db.String(150), nullable=False)
     playlist_name = db.Column(db.String(150), nullable=False)
-    playlist_id = db.Column(db.String(150), unique=True, nullable=False)
+    playlist_id = db.Column(db.String(150), unique=False, nullable=False)
     playlist_genre = db.Column(db.String(150), nullable=False)
     playlist_subgenre = db.Column(db.String(150), nullable=False)
     danceability = db.Column(db.Numeric(10,3), nullable=False)
     energy = db.Column(db.Numeric(10,4), nullable=False)
     key = db.Column(db.Integer, nullable=False)
     loudness = db.Column(db.Numeric(10,4), nullable=False)
-    mode = db.Column(db.Boolean, nullable=False)
+    mode = db.Column(db.Integer, nullable=False)
     speechiness = db.Column(db.Numeric(10,4), nullable=False)
     acousticness = db.Column(db.Numeric(10,5), nullable=False)
-    instrumentallness = db.Column(db.Numeric(10,5), nullable=False)
+    instrumentalness = db.Column(db.Numeric(10,5), nullable=False)
     liveness = db.Column(db.Numeric(10,5), nullable=False)
     valence = db.Column(db.Numeric(10,4), nullable=False)
     tempo = db.Column(db.Numeric(10,3), nullable=False)
@@ -51,6 +51,7 @@ class Song(db.Model):
             'track_artist': self.track_artist,
             'lyrics': self.lyrics,
             'track_album_id': self.track_album_id,
+            'track_album_name': self.track_album_name,
             'playlist_name': self.playlist_name,
             'playlist_id': self.playlist_id,
             'playlist_genre': self.playlist_genre,
@@ -62,7 +63,7 @@ class Song(db.Model):
             'mode': self.mode,
             'speechiness': self.speechiness,
             'acousticness': self.acousticness,
-            'instrumentallness': self.instrumentallness,
+            'instrumentalness': self.instrumentalness,
             'liveness': self.liveness,
             'valence': self.valence,
             'tempo': self.tempo,
