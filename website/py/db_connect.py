@@ -1,6 +1,6 @@
 import mysql.connector
 from mysql.connector import errorcode
-from secret import password as p
+from utility.secret import password as p
 
 try:
     db = mysql.connector.connect(
