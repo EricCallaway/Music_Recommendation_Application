@@ -2,31 +2,171 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-    <h1 align="center">Notes</h1>
-    <ul class="list-group list-group-flush" id="notes">
-        {% for note in user.notes %}
-            <li class="list-group-item">{{ note.data }}
-                <button type="button" class="close" onClick="deleteNote({{ note.id }})">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </li>
-        {% endfor %}
-    </ul>
-    <form action="selected" method="POST">
-        <select name="selected_value">
-            {% for song in songs %}
-                <option value="{{ song.id }}">{{ song.name }} by {{ song.artist }}</option>
-            {% endfor %}
-            <br><br>
-            <input type="submit" value="Submit">
-        </select>
+<center><h1>Music Recommendation Project</h1></center>
 
-    </form>
-    <form method="POST">
-        <textarea name="note" id="note" class="form-control"></textarea>
-        <br>
-        <div align="center">
-            <button type="submit" class="btn btn-primary">Add Note</button>
-        </div>
-    </form>
+<style>
+    tr:hover {background-color:greenyellow}
+
+    .container{
+        display: flex;
+        flex-direction: row;
+    }
+    .column {
+        flex: 1;
+        padding: 20px;
+    }
+</style>
+<div class="container">
+    <div class="column">
+        <table id="selected-songs" class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Artist</th>
+                    <th>Album</th>
+                    <th>Remove from Playlist</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+    <div class="column">
+        <table id="song_data" class="table">
+            <thead>
+                <tr>
+                    <th>Song ID</th>
+                    <th>Track ID</th>
+                    <th>Name</th>
+                    <th>Artist</th>
+                    <th>Lyrics</th>
+                    <th>Album ID</th>
+                    <th>Album Name</th>
+                    <th>PlayList Name</th>
+                    <th>Playlist ID</th>
+                    <th>Playlist Genre</th>
+                    <th>Playlist Subgenre</th>
+                    <th>Danceability</th>
+                    <th>Energy</th>
+                    <th>Key</th>
+                    <th>Loudness</th>
+                    <th>Mode</th>
+                    <th>Speechiness</th>
+                    <th>Acousticness</th>
+                    <th>Instrumentalness</th>
+                    <th>Liveness</th>
+                    <th>Valence</th>
+                    <th>Tempo</th>
+                    <th>Duration (ms)</th>
+                    <th>Language</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+
+    $(document).ready(function () {
+        var song_catalog = $('#song_data').DataTable({
+            ajax: '/api/data',
+            serverSide: true,
+            columns: [
+                {data: 'id'},
+                {data: 'track_id', visible: false},
+                {data: 'track_name'},
+                {data: 'track_artist'},
+                {data: 'lyrics', visible: false},
+                {data: 'track_album_id', visible: false},
+                {data: 'track_album_name', visible: true},
+                {data: 'playlist_name', visible: false},
+                {data: 'playlist_id', visible: false},
+                {data: 'playlist_genre', visible: false},
+                {data: 'playlist_subgenre', visible: false},
+                {data: 'danceability', visible: false},
+                {data: 'energy', visible: false},
+                {data: 'key', visible: false},
+                {data: 'loudness', visible: false},
+                {data: 'mode', visible: false},
+                {data: 'speechiness', visible: false},
+                {data: 'acousticness', visible: false},
+                {data: 'instrumentalness', visible: false},
+                {data: 'liveness', visible: false},
+                {data: 'valence', visible: false},
+                {data: 'tempo', visible: false},
+                {data: 'duration_ms', visible: false},
+                {data: 'language', visible: false},
+                
+            ],
+            dom: 'Bfrtip',
+            buttons: ['colvis'],
+            createdRow: function(row, data, dataIndex){
+                $(row).attr('onclick', 'selectRow(this)');
+            }
+        });
+
+    });
+
+    var selected_songs = [];
+
+    function selectRow(row){
+        // Grab the table representing the users playlist, note it will be empty in the beginning
+        var playlist = document.getElementById("selected-songs");
+        var cells = row.getElementsByTagName("td");
+        var song_name = cells[1].textContent;
+        var song_artist = cells[2].textContent;
+        var album_name = cells[3].textContent; 
+        
+        // Check if the song has already been chosen by the user
+        if (selected_songs.includes(song_name)){
+            swal("The song "+ song_name + "by " + song_artist + " has already been selected.");
+            return;
+        }
+
+        if (selected_songs.length >= 10){
+            swal("Playlist capacity reached. No more than 10 songs allowed.");
+            return;
+        }
+        // Add song to the selected songs array
+        selected_songs.push(song_name);
+
+        // Create a new row in the playlist table
+        var newRow = document.createElement("tr");
+        var track_name = document.createElement("td");
+        var track_artist = document.createElement("td");
+        var track_album_name = document.createElement("td");
+
+        track_name.textContent = song_name;
+        track_artist.textContent = song_artist;
+        track_album_name.textContent = album_name;
+
+        newRow.appendChild(track_name);
+        newRow.appendChild(track_artist);
+        newRow.appendChild(track_album_name);
+
+        // Create a delete button for the new row
+        var deleteButton = document.createElement("button");
+        deleteButton.textContent = "Delete";
+        deleteButton.onclick = function () {
+            // Remove the song from the selected playlist
+            var index = selected_songs.indexOf(song_name);
+            if (index > -1){
+                selected_songs.splice(index, 1);
+            }
+            playlist.deleteRow(newRow.rowIndex);
+        }
+
+        newRow.appendChild(deleteButton);
+
+        // This adds the selected song to the playlist table
+        playlist.appendChild(newRow);
+    }
+</script>
+   
 {% endblock %}
