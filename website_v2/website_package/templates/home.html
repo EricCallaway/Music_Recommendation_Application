@@ -203,7 +203,7 @@
             var input = document.createElement("input");
             input.setAttribute('type', 'hidden');
             input.name = 'song' + i;
-            input.value = playlistData[i].name;
+            input.value = playlistData[i].trackid;
             document.getElementById('selected-songs').appendChild(input);
             console.log(input);
         }
