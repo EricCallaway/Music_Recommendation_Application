@@ -3,37 +3,36 @@ from flask_login import login_user, login_required, logout_user, current_user
 from .models import Note, Song, User, Pet
 from . import db 
 import json
+import joblib
 
 #Creating blueprint named "views"
 views = Blueprint('views', __name__)
+
+def recommend_songs(playlist):
+    # Load the previously trained model
+    model = joblib.load('../../../training_model/model_testing.ipynb')
+
+    # Use the model to make predictions on the playlist
+    predictions = model.predict(playlist)
+
+    # Return the predictions 
+    return predictions
 
 @views.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
     if request.method == 'POST':
-        note = request.form.get('note')
-
-        if len(note) < 1:
-            flash('Note is too short!', category='error')
-        else:
-            new_note = Note(data=note, user_id=current_user.id)
-            db.session.add(new_note)
-            db.session.commit()
-            flash('Note added!', category='success')
+        playlist = []
+        for i in range(len(request.form)):
+            song = request.form.get(f'song{i}')
+            if song:
+                playlist.append(song)
+        print('$'*50)
+        print(playlist)
+        print('$'*50)
+        print(len(request.form))
 
     return render_template("home.html", user=current_user)
-
-#takes string from js function and makes it a python function
-@views.route('/delete-note', methods=['POST'])
-def delete_note():
-    note = json.loads(request.data)
-    noteId = note['noteId']
-    note = Note.query.get(noteId)
-    if note:
-        if note.user_id == current_user.id:
-            db.session.delete(note)
-            db.session.commit()
-    return jsonify({})
 
 @views.route('/songs', methods=['GET', 'POST'])
 def display_songs():
@@ -109,3 +108,11 @@ def song_data():
 def show_pet():
     pets = Pet.query.all()
     return render_template('pets.html', user=current_user, pets=pets)
+
+@views.route('/fruits', methods=['GET', 'POST'])
+def fruits():
+    if request.method == 'POST':
+        fruit = []
+        fruit.append(request.form.get('fruit_input'))
+        print(fruit)
+    return render_template('fruits.html', user=current_user)

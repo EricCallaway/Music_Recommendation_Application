@@ -16,20 +16,24 @@
         padding: 20px;
     }
 </style>
+
 <div class="container">
     <div class="column">
-        <table id="selected-songs" class="table">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Artist</th>
-                    <th>Album</th>
-                    <th>Remove from Playlist</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
+        <form  method="post">
+            <button type="submit" onclick="save_playlist()">Save</button>
+            <table id="selected-songs" name="selected-songs" class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Artist</th>
+                        <th>Album</th>
+                        <th>Remove from Playlist</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </form>
     </div>
     <div class="column">
         <table id="song_data" class="table">
@@ -72,7 +76,6 @@
 {% block scripts %}
 
 <script>
-
     $(document).ready(function () {
         var song_catalog = $('#song_data').DataTable({
             ajax: '/api/data',
@@ -166,6 +169,39 @@
 
         // This adds the selected song to the playlist table
         playlist.appendChild(newRow);
+    }
+
+    function save_playlist(){     
+        // Get the table element
+        var table = document.getElementById("selected-songs");
+
+        // Get the table data
+        var data = []
+        var headers = []
+        for (var i = 0; i < table.rows[0].cells.length; i++){
+            headers[i] = table.rows[0].cells[i].innerHTML.toLowerCase().replace(/ /gi, '');
+        }
+        for (var i = 1; i < table.rows.length; i++) {
+            var tableRow = table.rows[i];
+            var rowData = {};
+            for (var j = 0; j < tableRow.cells.length; j++) {
+              rowData[headers[j]] = tableRow.cells[j].innerHTML;
+            }
+            data.push(rowData);
+           }
+
+        // Assign the data to a variable
+        var playlistData = data;
+        
+        // Do something with the playlistData variable
+        for (var i = 0; i < playlistData.length; i++){
+            var input = document.createElement("input");
+            input.setAttribute('type', 'hidden');
+            input.name = 'song' + i;
+            input.value = playlistData[i].name;
+            document.getElementById('selected-songs').appendChild(input);
+            console.log(input);
+        }
     }
 </script>
    
