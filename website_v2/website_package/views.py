@@ -1,12 +1,33 @@
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
 from flask_login import login_user, login_required, logout_user, current_user
+from flask_mysqldb import MySQL
+from sqlalchemy import text
 from .models import Note, Song, User, Pet
+from decimal import Decimal
 from . import db 
+
+import numpy as np
 import json
 import joblib
+import MySQLdb.cursors
 
 #Creating blueprint named "views"
 views = Blueprint('views', __name__)
+
+def pad_and_reshape(arr):
+    num_rows, num_cols = arr.shape[1], arr.shape[2]
+    col_avgs = np.mean(arr, axis=1).reshape(-1, num_cols) # calculate the average of each column
+    padded_arr = np.empty((1, 35, 12))
+    padded_arr.fill(np.nan) # fill with NaN values initially
+
+    # copy original array to padded array
+    padded_arr[:, :num_rows, :num_cols] = arr
+
+    # pad remaining rows with average of each column
+    for i in range(num_rows, 35):
+        padded_arr[:, i] = col_avgs
+
+    return padded_arr
 
 def recommend_songs(playlist):
     # Load the previously trained model
@@ -18,11 +39,14 @@ def recommend_songs(playlist):
     # Return the predictions 
     return predictions
 
+
 @views.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
     if request.method == 'POST':
+        audio_cols = ['danceability', 'energy', 'key', 'loudness', 'mode', 'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo', 'duration_ms']
         playlist = []
+        input_seq = []
         for i in range(len(request.form)):
             song = request.form.get(f'song{i}')
             if song:
@@ -31,6 +55,58 @@ def home():
         print(playlist)
         print('$'*50)
         print(len(request.form))
+        
+
+        model = joblib.load('training_model/simpleRNN.pkl')
+        
+        playlist_quoted = [f"'{elem}'" for elem in playlist]
+        sql = text(f'SELECT {", ".join("`"+col+"`" if col == "key" else col for col in audio_cols)} FROM song WHERE track_id IN ({", ".join(playlist_quoted)})')
+        print(sql)
+        session = db.session()
+        try:
+            cursor = session.execute(sql).cursor
+            records = cursor.fetchall()
+            print('%'*50)
+            print(records)
+            print('%'*50)
+            for row in records:
+                print(type(row))
+                row = list(row)
+                row = [float(x) if isinstance(x, Decimal) or isinstance(x, int) else x for x in row]
+                print(type(row))
+                print(row)
+                input_seq.append(row)
+        except Exception as e:
+            print("Error executing query:", e)
+            session.rollback()
+        finally:
+            session.close()
+        
+        print('^'*50)
+        print(input_seq)
+        print(len(input_seq))
+        print('^'*50)
+
+        # Converting input sequence into a 3D numpy array required for RNN model
+        np_input_seq = np.array(input_seq)
+        three_dim_input_seq = np.reshape(np_input_seq, (1, len(input_seq), 12))
+        print(three_dim_input_seq.shape)
+
+        # Pad the playlist to the optimal dimensions of (1, 35, 12)
+        padded_playlist = pad_and_reshape(three_dim_input_seq)
+        print(padded_playlist.shape)
+
+        predictions = model.predict(padded_playlist)
+        print('@'*50)
+        print(predictions)
+        print('@'*50)
+
+
+
+
+        
+
+
 
     return render_template("home.html", user=current_user)
 
