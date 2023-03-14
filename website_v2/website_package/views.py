@@ -106,19 +106,9 @@ def home():
         print(predictions)
         print('@'*50)
 
-        # converting this 2D list into a 2D numpy array
-        dt = np.dtype([('col0', '<U32'), ('col1', '<U32'), ('col2', np.float32), ('col3', np.float32), ('col4', np.float32), 
-               ('col5', np.float32), ('col6', np.float32), ('col7', np.float32), ('col8', np.float32), 
-               ('col9', np.float32), ('col10', np.float32), ('col11', np.float32), ('col12', np.float32)])
-
         master_audio_feats = np.array(master_audio_feats)
-        print(master_audio_feats.shape)
         master_audio_feats[:, 1:].astype(np.float32)
-        print(master_audio_feats.shape)
-        # print(master_audio_feats[:5])
-        # print(master_audio_feats[:5, 1:])
-        # print(master_audio_feats[:, 0])
-        print(master_audio_feats.dtype)
+        
         
         # calculate the cosine similarity between the input array and each row of the larger array
         cosine_similarites = np.apply_along_axis(lambda x: 1 - cosine(predictions, x), 1, master_audio_feats[:, 1:].astype(np.float32))
