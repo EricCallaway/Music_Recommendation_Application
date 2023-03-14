@@ -15,6 +15,10 @@
         flex: 1;
         padding: 20px;
     }
+
+    #recommended-songs caption {
+        caption-side: top;
+    }
 </style>
 
 <div class="container">
@@ -67,6 +71,30 @@
                 </tr>
             </thead>
             <tbody>
+            </tbody>
+        </table>
+    </div>
+    <div class="column">
+        <table id="recommended-songs" name="recommended-songs" class="table">
+            <thead>
+                
+                <tr>
+                    <th>Track ID</th>
+                    <th>Name</th>
+                    <th>Artist</th>
+                    <th>Album</th>
+                </tr>
+            </thead>
+            <tbody>
+                <caption><strong>Recommended Songs</strong></caption>
+                {% for row in recommended_tracks %}
+                <tr>
+                    <td>{{row[0]}}</td>
+                    <td>{{row[1]}}</td>
+                    <td>{{row[2]}}</td>
+                    <td>{{row[3]}}</td>
+                </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
@@ -207,7 +235,11 @@
             document.getElementById('selected-songs').appendChild(input);
             console.log(input);
         }
+
+
     }
+
+    
 </script>
    
 {% endblock %}
