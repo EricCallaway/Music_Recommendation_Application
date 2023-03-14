@@ -5,6 +5,8 @@ from sqlalchemy import text
 from .models import Note, Song, User, Pet
 from decimal import Decimal
 from . import db 
+from sklearn.metrics.pairwise import cosine_similarity
+from scipy.spatial.distance import cosine
 
 import numpy as np
 import json
@@ -29,15 +31,7 @@ def pad_and_reshape(arr):
 
     return padded_arr
 
-def recommend_songs(playlist):
-    # Load the previously trained model
-    model = joblib.load('../../../training_model/model_testing.ipynb')
 
-    # Use the model to make predictions on the playlist
-    predictions = model.predict(playlist)
-
-    # Return the predictions 
-    return predictions
 
 
 @views.route('/', methods=['GET', 'POST'])
@@ -47,6 +41,7 @@ def home():
         audio_cols = ['danceability', 'energy', 'key', 'loudness', 'mode', 'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo', 'duration_ms']
         playlist = []
         input_seq = []
+        master_audio_feats = []
         for i in range(len(request.form)):
             song = request.form.get(f'song{i}')
             if song:
@@ -60,16 +55,26 @@ def home():
         model = joblib.load('training_model/simpleRNN.pkl')
         
         playlist_quoted = [f"'{elem}'" for elem in playlist]
-        sql = text(f'SELECT {", ".join("`"+col+"`" if col == "key" else col for col in audio_cols)} FROM song WHERE track_id IN ({", ".join(playlist_quoted)})')
-        print(sql)
+        sql_user_playlist = text(f'SELECT {", ".join("`"+col+"`" if col == "key" else col for col in audio_cols)} FROM song WHERE track_id IN ({", ".join(playlist_quoted)})')
+        sql_all_audio_feats = text(f'SELECT track_id, {", ".join("`"+col+"`" if col == "key" else col for col in audio_cols)} FROM song')
+        # sql_all_audio_feats = text(f'SELECT {", ".join("`"+col+"`" if col == "key" else col for col in audio_cols)} FROM song')
+        
+        print(sql_user_playlist)
         session = db.session()
         try:
-            cursor = session.execute(sql).cursor
-            records = cursor.fetchall()
+            cursor = session.execute(sql_user_playlist).cursor
+            user_playlist_audio_feats = cursor.fetchall()
+            cursor = session.execute(sql_all_audio_feats).cursor
+            all_audio_feats = cursor.fetchall()
             print('%'*50)
-            print(records)
+            print(f'ALL AUDIO FEATURES: {len(all_audio_feats)} ')
+            print(user_playlist_audio_feats)
             print('%'*50)
-            for row in records:
+            for row in all_audio_feats:
+                row = [float(x) if isinstance(x, Decimal) or isinstance(x, int) else x for x in row]
+                master_audio_feats.append(row)
+
+            for row in user_playlist_audio_feats:
                 print(type(row))
                 row = list(row)
                 row = [float(x) if isinstance(x, Decimal) or isinstance(x, int) else x for x in row]
@@ -101,12 +106,30 @@ def home():
         print(predictions)
         print('@'*50)
 
+        # converting this 2D list into a 2D numpy array
+        dt = np.dtype([('col0', '<U32'), ('col1', '<U32'), ('col2', np.float32), ('col3', np.float32), ('col4', np.float32), 
+               ('col5', np.float32), ('col6', np.float32), ('col7', np.float32), ('col8', np.float32), 
+               ('col9', np.float32), ('col10', np.float32), ('col11', np.float32), ('col12', np.float32)])
 
-
-
+        master_audio_feats = np.array(master_audio_feats)
+        print(master_audio_feats.shape)
+        master_audio_feats[:, 1:].astype(np.float32)
+        print(master_audio_feats.shape)
+        # print(master_audio_feats[:5])
+        # print(master_audio_feats[:5, 1:])
+        # print(master_audio_feats[:, 0])
+        print(master_audio_feats.dtype)
         
-
-
+        # calculate the cosine similarity between the input array and each row of the larger array
+        cosine_similarites = np.apply_along_axis(lambda x: 1 - cosine(predictions, x), 1, master_audio_feats[:, 1:].astype(np.float32))
+        most_similar_index = np.argsort(cosine_similarites[::-1][:5])
+        print(f"Most similar row index(es): {most_similar_index}")
+        recommended_track_ids = []
+        for i in range(len(master_audio_feats)):
+            if i in most_similar_index:
+                recommended_track_ids.append(master_audio_feats[i, 0])
+        
+        print(recommended_track_ids)
 
     return render_template("home.html", user=current_user)
 
