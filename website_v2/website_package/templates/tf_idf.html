@@ -48,7 +48,6 @@
             ajax: '/api/billboard_songs',
             serverSide: true,
             columns: [
-                {data: 'id'},
                 {data: 'date'},
                 {data: 'title'},
                 {data: 'artist'},
@@ -75,7 +74,13 @@
             dom: 'Bfrtip',
             buttons: ['colvis']
         });
+        $('#billboard_songs').on('click', 'tr', function(){
+            var data = $('#billboard_songs').DataTable().row( this ).data();
+            swal("Great Choice!", "You chose the song '" + data.title + "' by " + "'" + data.artist + "'");
+        });
     });
+
+    
 </script>
 
 {% endblock %}

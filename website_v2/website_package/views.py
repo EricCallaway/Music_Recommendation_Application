@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, flash, jsonify, redirect,
 from flask_login import login_user, login_required, logout_user, current_user
 from flask_mysqldb import MySQL
 from sqlalchemy import text
-from .models import Note, Song, User, Pet, Billboard
+from .models import Note, User, Pet, Billboard
 from decimal import Decimal
 from . import db 
 from sklearn.metrics.pairwise import cosine_similarity
@@ -52,7 +52,7 @@ def billboard_song_data():
     #sorting
     order = []
     cols = [
-        'id', 'date', 'title', 'artist', 'spotify_link', 'spotify_id',
+        'date', 'title', 'artist', 'spotify_link', 'spotify_id',
         'genre', 'analysis_url', 'energy', 'liveness', 'tempo', 'speechiness',
         'acousticness', 'instrmentalness', 'time_signature', 'danceability', 
         'key', 'duration_ms', 'loudness', 'valence', 'mode', 'lyrics', 'clean_lyrics'
@@ -231,7 +231,7 @@ def song_data():
     #sorting
     order = []
     cols = [
-        'id', 'track_id', 'track_name', 'track_artist', 'lyrics', 'track_album_id' , 'playlist_name',
+        'track_id', 'track_name', 'track_artist', 'lyrics', 'track_album_id' , 'playlist_name',
         'playlist_id', 'playlist_genre', 'playlist_subgenre', 'danceability', 'energy' , 'key',
         'loudness', 'mode', 'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo', 'duration_ms', 'language']
     i = 0
