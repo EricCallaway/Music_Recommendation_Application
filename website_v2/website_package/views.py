@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, flash, jsonify, redirect,
 from flask_login import login_user, login_required, logout_user, current_user
 from flask_mysqldb import MySQL
 from sqlalchemy import text
-from .models import Note, Song, User, Pet
+from .models import Note, Song, User, Pet, Billboard
 from decimal import Decimal
 from . import db 
 from sklearn.metrics.pairwise import cosine_similarity
@@ -31,6 +31,63 @@ def pad_and_reshape(arr):
 
     return padded_arr
 
+@views.route('/tf_idf', methods=['GET', 'POST'])
+@login_required
+def tf_idf():
+    return render_template('tf_idf.html', user=current_user)
+
+@views.route('api/billboard_songs')
+def billboard_song_data():
+    query = Billboard.query
+
+    #search filter
+    search = request.args.get('search[value]')
+    if search:
+        query = query.filter(db.or_(
+            Billboard.name.like(f'%{search}%'),
+            Billboard.artist.like(f'%{search}%')
+        ))
+    total_filtered = query.count()
+
+    #sorting
+    order = []
+    cols = [
+        'id', 'date', 'title', 'artist', 'spotify_link', 'spotify_id',
+        'genre', 'analysis_url', 'energy', 'liveness', 'tempo', 'speechiness',
+        'acousticness', 'instrmentalness', 'time_signature', 'danceability', 
+        'key', 'duration_ms', 'loudness', 'valence', 'mode', 'lyrics', 'clean_lyrics'
+    ]
+    i = 0 
+    
+    while True:
+        col_index = request.args.get(f'order[{i}][column]')
+        if col_index is None:
+            break
+        col_name = request.args.get(f'columns[{col_index}][data]')
+        if col_name not in cols:
+            col_name = 'title'
+        descending = request.args.get(f'order[{i}][dir]') == 'desc'
+        col = getattr(Billboard, col_name)
+        if descending:
+            col = col.desc()
+        order.append(col)
+        i += 1
+
+    if order:
+        query = query.order_by(*order)
+
+    #pagination
+    start = request.args.get('start', type=int)
+    length = request.args.get('length', type=int)
+    query = query.offset(start).limit(length)
+
+    #response
+    return {
+        'data': [billboard.to_dict() for billboard in query],
+        'recordsFiltered': total_filtered,
+        'recordsTotal': Billboard.query.count(),
+        'draw': request.args.get('draw', type=int),
+    }
 
 
 

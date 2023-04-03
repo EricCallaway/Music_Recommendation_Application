@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}TF-IDF Recommendation{% endblock %}
+
+{% block content %}
+<center><h1>TF-IDF Recommendation System 😎</h1></center>
+
+<style>
+    tr:hover {background-color:lightblue}
+</style>
+
+<table id="billboard_songs" class="table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Title</th>
+            <th>Artist</th>
+            <th>Spotify Link</th>
+            <th>Spotify ID</th>
+            <th>Genre</th>
+            <th>Analysis URL Name</th>
+            <th>Energy</th>
+            <th>Liveness</th>
+            <th>Tempo</th>
+            <th>Speechiness</th>
+            <th>Acousticness</th>
+            <th>Instrumentalness</th>
+            <th>Time Signature</th>
+            <th>Danceability</th>
+            <th>Key</th>
+            <th>Duration (ms)</th>
+            <th>Loudness</th>
+            <th>Valence</th>
+            <th>Mode</th>
+            <th>Lyrics</th>
+            <th>Clean Lyrics</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+
+</table>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready( function () {
+        $('#billboard_songs').DataTable({
+            ajax: '/api/billboard_songs',
+            serverSide: true,
+            columns: [
+                {data: 'id'},
+                {data: 'date'},
+                {data: 'title'},
+                {data: 'artist'},
+                {data: 'spotify_link'},
+                {data: 'spotify_id', visible: false},
+                {data: 'genre', visible: false},
+                {data: 'analysis_url', visible: false},
+                {data: 'energy', visible: false},
+                {data: 'liveness', visible: false},
+                {data: 'tempo', visible: false},
+                {data: 'speechiness', visible: false},
+                {data: 'acousticness', visible: false},
+                {data: 'instrumentalness', visible: false},
+                {data: 'time_signature', visible: false},
+                {data: 'danceability', visible: false},
+                {data: 'key', visible: false},
+                {data: 'duration_ms', visible: false},
+                {data: 'loudness', visible: false},
+                {data: 'valence', visible: false},
+                {data: 'mode', visible: false},
+                {data: 'lyrics', visible: false},
+                {data: 'clean_lyrics', visible: false},
+            ],
+            dom: 'Bfrtip',
+            buttons: ['colvis']
+        });
+    });
+</script>
+
+{% endblock %}
