@@ -1,14 +1,16 @@
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
 from flask_login import login_user, login_required, logout_user, current_user
 from flask_mysqldb import MySQL
-from sqlalchemy import text
+from sqlalchemy import text, create_engine
 from .models import Note, User, Pet, Billboard
 from decimal import Decimal
 from . import db 
-from sklearn.metrics.pairwise import cosine_similarity
 from scipy.spatial.distance import cosine
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 import numpy as np
+import pandas as pd
 import json
 import joblib
 import MySQLdb.cursors
@@ -31,10 +33,208 @@ def pad_and_reshape(arr):
 
     return padded_arr
 
+# def genereate_recommendations(user_playlist_song_ids):
+#             # Grab the clean lyrics from the database
+#             sql_clean_lyrics = text('SELECT clean_lyrics FROM billboard;')
+#             sql_all_data = text('SELECT * FROM billboard;')
+#             session = db.session()
+
+#             try:
+#                 clean_lyric_cursor = session.execute(sql_clean_lyrics).cursor
+#                 all_data_cursor = session.execute(sql_all_data).cursor
+#                 all_data = all_data_cursor.fetchall()
+#                 clean_lyrics = clean_lyric_cursor.fetchall()
+#             except Exception as e:
+#                 print('Error executing query: ', e)
+#                 session.rollback()
+#             finally:
+#                 session.close()
+            
+#             # Convert the clean lyrics to a list
+#             clean_lyrics = [i[0] for i in clean_lyrics]
+
+#             # Convert the clean lyrics to a pandas dataframe
+#             clean_lyrics = pd.DataFrame(clean_lyrics)
+
+#             # Convert the all data to a pandas dataframe
+#             all_data = pd.DataFrame(all_data)
+            
+
+#             # Rename the column to 'clean_lyrics'
+#             clean_lyrics.rename(columns={0: 'clean_lyrics'}, inplace=True)
+#             print(clean_lyrics.head())
+
+#             # print(all_data.head())
+
+#             # Rename columns of all_data
+#             all_data.rename(columns={0: 'date', 
+#                                      1: 'title', 
+#                                      2: 'artist',
+#                                      3: 'spotify_link',
+#                                      4: 'spotify_id',
+#                                      21: 'clean_lyrics'}, inplace=True)
+
+
+#             print(all_data.head())
+
+#             # Assign only title, artist, spotify_id, and clean_lyrics to a new dataframe
+#             data = all_data[['title', 'artist', 'spotify_id', 'clean_lyrics']]
+
+#             print(data.head())
+            
+
+#             # Create a Tf-Idf Vectorier Object
+#             vectorizer = TfidfVectorizer()
+
+#             # Fit the vectorizer to the clean lyrics, creating a tf-idf matrix where the words are the features
+#             tfidf_matrix = vectorizer.fit_transform(data['clean_lyrics'])
+
+#             # Transform the user playlist into a tf-idf matrix
+#             user_playlist_tfidf = vectorizer.transform(user_playlist_song_ids)
+
+#             # Calculate the cosine similarity between the user playlist and the billboard songs
+#             cosine_similarities = cosine_similarity(user_playlist_tfidf, tfidf_matrix).flatten()
+
+#             # Sort the indices by similarity score in descending order
+#             song_indices = cosine_similarities.argsort()[::-2]
+#             print(song_indices)
+
+#             recommended_songs = []
+#             for i in song_indices:
+#                 if len(recommended_songs) == 5:
+#                     break
+#                 elif data.loc[i, 'spotify_id'] in user_playlist_song_ids:
+#                     continue
+#                 else:
+#                     recommended_songs.append(data.loc[i, 'spotify_id'])
+#                 print(recommended_songs)
+
+
+#             # Get the top 10 most similar songs spotify ids
+
+#             # top_10_songs = Billboard.query.filter(Billboard.spotify_id.in_(top_10_indices)).all()
+#             # print(top_10_songs)
+
+#             # Get the top 10 most similar songs spotify ids
+#             # top_10_songs = Billboard.query.filter(Billboard.spotify_id.in_(top_10_indices)).all()
+#             # print(top_10_songs)
+
+#             return recommended_songs
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import pandas as pd
+
+def generate_recommendations(user_playlist_song_ids):
+
+    engine = create_engine('mysql://root:Eric19$$@localhost:3306/music_app')
+    connection = engine.connect()
+
+    query = text('SELECT * FROM billboard;')
+
+    all_data = connection.execute(query).fetchall()
+
+    connection.close()
+
+    # Convert the all data to a pandas dataframe
+    all_data = pd.DataFrame(all_data)
+    print(all_data.head())
+
+    # Rename columns of all_data
+    all_data.rename(columns={0: 'date',
+                             1: 'title',
+                             2: 'artist',
+                             3: 'spotify_link',
+                             4: 'spotify_id',
+                             21: 'clean_lyrics'}, inplace=True)
+    
+    data = all_data[['title', 'artist', 'spotify_id', 'clean_lyrics']]
+
+    print(data.shape)
+    
+
+    # Create a Tf-Idf Vectorizer Object
+    vectorizer = TfidfVectorizer()
+
+    # Fit the vectorizer to the clean lyrics, creating a tf-idf matrix where the words are the features
+    tfidf_matrix = vectorizer.fit_transform(all_data['clean_lyrics'])
+
+    # Transform the user playlist into a tf-idf matrix
+    user_playlist_lyrics = data[data['spotify_id'].isin(user_playlist_song_ids)]['clean_lyrics'].tolist()
+    user_playlist_tfidf = vectorizer.transform(user_playlist_lyrics)
+
+    # Calculate the cosine similarity between the user playlist and the billboard songs
+    cosine_similarities = cosine_similarity(user_playlist_tfidf, tfidf_matrix).flatten()
+
+    # Reduce the number of indices to 6775, the number of indices was upwards of 20,000 for some reason
+    cosine_similarities = cosine_similarities[:6775]
+
+    print(type(cosine_similarities))
+
+    # Sort the indices by similarity score in descending order
+    song_indices = cosine_similarities.argsort()[::-1]
+
+    print(song_indices)
+
+    recommended_songs = []
+    for i in song_indices:
+        if data.loc[i, 'spotify_id'] in user_playlist_song_ids:
+            continue
+        else:
+            recommended_songs.append(data.loc[i, 'spotify_id'])
+            if len(recommended_songs) == 5:
+                break
+
+    return recommended_songs
+
+
+
+
+
+            
+
+            
+
 @views.route('/tf_idf', methods=['GET', 'POST'])
 @login_required
 def tf_idf():
-    return render_template('tf_idf.html', user=current_user)
+    if request.method == 'POST':
+        playlist = []
+        print("Hello World.")
+        for i in range(len(request.form)):
+            song = request.form.get(f'song{i}')
+            if song:
+                playlist.append(song)
+        print('$'*50)
+        print(playlist)
+        print('$'*50)
+        recommended_songs = generate_recommendations(playlist)
+
+        print('%'*50)
+        print(recommended_songs)
+        print('%'*50)
+
+        recommended_song_ids = [f"'{song}'" for song in recommended_songs]
+        sql_recommended_songs = text(f'SELECT title, artist, spotify_link, spotify_id FROM billboard WHERE spotify_id IN ({", ".join(recommended_song_ids)});')
+        session = db.session()
+        try:
+            cursor = session.execute(sql_recommended_songs).cursor
+            recommended_songs = cursor.fetchall()
+        except Exception as e:
+            print("Error executing query: ", e)
+            session.rollback()
+        finally:
+            session.close()
+        # print(recommended_songs)
+        recommended_songs = [list(song) for song in recommended_songs]
+        # print(recommended_songs)
+        for song in recommended_songs:
+            print(song[0])
+
+        
+
+
+    return render_template('tf_idf.html', user=current_user, recommended_songs=recommended_songs)
 
 @views.route('api/billboard_songs')
 def billboard_song_data():
