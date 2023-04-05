@@ -198,6 +198,7 @@ def generate_recommendations(user_playlist_song_ids):
 @views.route('/tf_idf', methods=['GET', 'POST'])
 @login_required
 def tf_idf():
+    recommended_songs = []
     if request.method == 'POST':
         playlist = []
         print("Hello World.")
