@@ -1,9 +1,7 @@
-from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
-from flask_login import login_user, login_required, logout_user, current_user
-from flask_mysqldb import MySQL
+from flask import Blueprint, render_template, request
+from flask_login import login_required, current_user
 from sqlalchemy import text, create_engine
-from .models import Note, User, Pet, Billboard
-from decimal import Decimal
+from .models import Billboard
 from . import db 
 from scipy.spatial.distance import cosine
 from sklearn.metrics.pairwise import cosine_similarity
@@ -12,9 +10,6 @@ from typing import List
 
 import numpy as np
 import pandas as pd
-import json
-import joblib
-import MySQLdb.cursors
 
 #Creating blueprint named "views"
 views = Blueprint('views', __name__)
