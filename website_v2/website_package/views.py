@@ -1,12 +1,11 @@
+from . import db 
+from typing import List
+from .models import Billboard
+from sqlalchemy import text, create_engine
 from flask import Blueprint, render_template, request
 from flask_login import login_required, current_user
-from sqlalchemy import text, create_engine
-from .models import Billboard
-from . import db 
-from scipy.spatial.distance import cosine
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
-from typing import List
 
 import numpy as np
 import pandas as pd
@@ -116,6 +115,7 @@ def tf_idf():
 
 @views.route('api/billboard_songs')
 def billboard_song_data():
+    # Get data from Billboard table
     query = Billboard.query
 
     #search filter
@@ -168,13 +168,13 @@ def billboard_song_data():
     }
 
 
-
 @views.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
    
     return render_template("home.html", user=current_user)
 
+# This route will display the songs in the billboard table
 @views.route('/songs', methods=['GET', 'POST'])
 def display_songs():
     songs = Billboard.query
