@@ -8,6 +8,7 @@ from . import db
 from scipy.spatial.distance import cosine
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
+from typing import List
 
 import numpy as np
 import pandas as pd
@@ -18,127 +19,30 @@ import MySQLdb.cursors
 #Creating blueprint named "views"
 views = Blueprint('views', __name__)
 
-def pad_and_reshape(arr):
-    num_rows, num_cols = arr.shape[1], arr.shape[2]
-    col_avgs = np.mean(arr, axis=1).reshape(-1, num_cols) # calculate the average of each column
-    padded_arr = np.empty((1, 35, 12))
-    padded_arr.fill(np.nan) # fill with NaN values initially
+def generate_recommendations(user_playlist_song_ids: List[str]) -> list[str]:
+    """
+    Generates song recommendations based on the user's playlist.
+    
+    Parameters - user_playlist_song_ids: list of strings represented as spotify ids of songs in the user's playlist
 
-    # copy original array to padded array
-    padded_arr[:, :num_rows, :num_cols] = arr
+    Returns - recommended_songs: list of strings represented as spotify ids of songs recommended to the user
+    """
 
-    # pad remaining rows with average of each column
-    for i in range(num_rows, 35):
-        padded_arr[:, i] = col_avgs
-
-    return padded_arr
-
-# def genereate_recommendations(user_playlist_song_ids):
-#             # Grab the clean lyrics from the database
-#             sql_clean_lyrics = text('SELECT clean_lyrics FROM billboard;')
-#             sql_all_data = text('SELECT * FROM billboard;')
-#             session = db.session()
-
-#             try:
-#                 clean_lyric_cursor = session.execute(sql_clean_lyrics).cursor
-#                 all_data_cursor = session.execute(sql_all_data).cursor
-#                 all_data = all_data_cursor.fetchall()
-#                 clean_lyrics = clean_lyric_cursor.fetchall()
-#             except Exception as e:
-#                 print('Error executing query: ', e)
-#                 session.rollback()
-#             finally:
-#                 session.close()
-            
-#             # Convert the clean lyrics to a list
-#             clean_lyrics = [i[0] for i in clean_lyrics]
-
-#             # Convert the clean lyrics to a pandas dataframe
-#             clean_lyrics = pd.DataFrame(clean_lyrics)
-
-#             # Convert the all data to a pandas dataframe
-#             all_data = pd.DataFrame(all_data)
-            
-
-#             # Rename the column to 'clean_lyrics'
-#             clean_lyrics.rename(columns={0: 'clean_lyrics'}, inplace=True)
-#             print(clean_lyrics.head())
-
-#             # print(all_data.head())
-
-#             # Rename columns of all_data
-#             all_data.rename(columns={0: 'date', 
-#                                      1: 'title', 
-#                                      2: 'artist',
-#                                      3: 'spotify_link',
-#                                      4: 'spotify_id',
-#                                      21: 'clean_lyrics'}, inplace=True)
-
-
-#             print(all_data.head())
-
-#             # Assign only title, artist, spotify_id, and clean_lyrics to a new dataframe
-#             data = all_data[['title', 'artist', 'spotify_id', 'clean_lyrics']]
-
-#             print(data.head())
-            
-
-#             # Create a Tf-Idf Vectorier Object
-#             vectorizer = TfidfVectorizer()
-
-#             # Fit the vectorizer to the clean lyrics, creating a tf-idf matrix where the words are the features
-#             tfidf_matrix = vectorizer.fit_transform(data['clean_lyrics'])
-
-#             # Transform the user playlist into a tf-idf matrix
-#             user_playlist_tfidf = vectorizer.transform(user_playlist_song_ids)
-
-#             # Calculate the cosine similarity between the user playlist and the billboard songs
-#             cosine_similarities = cosine_similarity(user_playlist_tfidf, tfidf_matrix).flatten()
-
-#             # Sort the indices by similarity score in descending order
-#             song_indices = cosine_similarities.argsort()[::-2]
-#             print(song_indices)
-
-#             recommended_songs = []
-#             for i in song_indices:
-#                 if len(recommended_songs) == 5:
-#                     break
-#                 elif data.loc[i, 'spotify_id'] in user_playlist_song_ids:
-#                     continue
-#                 else:
-#                     recommended_songs.append(data.loc[i, 'spotify_id'])
-#                 print(recommended_songs)
-
-
-#             # Get the top 10 most similar songs spotify ids
-
-#             # top_10_songs = Billboard.query.filter(Billboard.spotify_id.in_(top_10_indices)).all()
-#             # print(top_10_songs)
-
-#             # Get the top 10 most similar songs spotify ids
-#             # top_10_songs = Billboard.query.filter(Billboard.spotify_id.in_(top_10_indices)).all()
-#             # print(top_10_songs)
-
-#             return recommended_songs
-
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
-import pandas as pd
-
-def generate_recommendations(user_playlist_song_ids):
-
+    # Connect to the database
     engine = create_engine('mysql://root:Eric19$$@localhost:3306/music_app')
     connection = engine.connect()
 
+    # Query the database for all the data in the billboard table
     query = text('SELECT * FROM billboard;')
 
+    # Fetch all the data from the database using the query defined above
     all_data = connection.execute(query).fetchall()
 
+    # Close the connection to the database
     connection.close()
 
     # Convert the all data to a pandas dataframe
     all_data = pd.DataFrame(all_data)
-    print(all_data.head())
 
     # Rename columns of all_data
     all_data.rename(columns={0: 'date',
@@ -148,10 +52,8 @@ def generate_recommendations(user_playlist_song_ids):
                              4: 'spotify_id',
                              21: 'clean_lyrics'}, inplace=True)
     
+    # Drop the columns that are not needed and assign to new dataframe
     data = all_data[['title', 'artist', 'spotify_id', 'clean_lyrics']]
-
-    print(data.shape)
-    
 
     # Create a Tf-Idf Vectorizer Object
     vectorizer = TfidfVectorizer()
@@ -169,13 +71,10 @@ def generate_recommendations(user_playlist_song_ids):
     # Reduce the number of indices to 6775, the number of indices was upwards of 20,000 for some reason
     cosine_similarities = cosine_similarities[:6775]
 
-    print(type(cosine_similarities))
-
     # Sort the indices by similarity score in descending order
     song_indices = cosine_similarities.argsort()[::-1]
 
-    print(song_indices)
-
+    # Create a list of recommended songs
     recommended_songs = []
     for i in song_indices:
         if data.loc[i, 'spotify_id'] in user_playlist_song_ids:
@@ -187,13 +86,6 @@ def generate_recommendations(user_playlist_song_ids):
 
     return recommended_songs
 
-
-
-
-
-            
-
-            
 
 @views.route('/tf_idf', methods=['GET', 'POST'])
 @login_required
