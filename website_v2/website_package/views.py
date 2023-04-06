@@ -90,23 +90,21 @@ def generate_recommendations(user_playlist_song_ids: List[str]) -> list[str]:
 @views.route('/tf_idf', methods=['GET', 'POST'])
 @login_required
 def tf_idf():
+    # Get the user's playlist
     recommended_songs = []
+
+    # When the user submits the form 
     if request.method == 'POST':
         playlist = []
-        print("Hello World.")
         for i in range(len(request.form)):
             song = request.form.get(f'song{i}')
             if song:
                 playlist.append(song)
-        print('$'*50)
-        print(playlist)
-        print('$'*50)
+         
+         # Generate recommendations
         recommended_songs = generate_recommendations(playlist)
 
-        print('%'*50)
-        print(recommended_songs)
-        print('%'*50)
-
+        # Query the database for the recommended songs
         recommended_song_ids = [f"'{song}'" for song in recommended_songs]
         sql_recommended_songs = text(f'SELECT title, artist, spotify_link, spotify_id FROM billboard WHERE spotify_id IN ({", ".join(recommended_song_ids)});')
         session = db.session()
@@ -118,14 +116,6 @@ def tf_idf():
             session.rollback()
         finally:
             session.close()
-        # print(recommended_songs)
-        recommended_songs = [list(song) for song in recommended_songs]
-        # print(recommended_songs)
-        for song in recommended_songs:
-            print(song[0])
-
-        
-
 
     return render_template('tf_idf.html', user=current_user, recommended_songs=recommended_songs)
 
