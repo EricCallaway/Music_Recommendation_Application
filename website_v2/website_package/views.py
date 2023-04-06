@@ -177,111 +177,12 @@ def billboard_song_data():
 @views.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
-    recommended_track_ids = []
-    recommended_tracks = ""
-    if request.method == 'POST':
-        audio_cols = ['danceability', 'energy', 'key', 'loudness', 'mode', 'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo', 'duration_ms']
-        playlist = []
-        input_seq = []
-        master_audio_feats = []
-        for i in range(len(request.form)):
-            song = request.form.get(f'song{i}')
-            if song:
-                playlist.append(song)
-        print('$'*50)
-        print(playlist)
-        print('$'*50)
-        print(len(request.form))
-        
-
-        model = joblib.load('training_model/simpleRNN.pkl')
-        
-        playlist_quoted = [f"'{elem}'" for elem in playlist]
-        sql_user_playlist = text(f'SELECT {", ".join("`"+col+"`" if col == "key" else col for col in audio_cols)} FROM song WHERE track_id IN ({", ".join(playlist_quoted)})')
-        sql_all_audio_feats = text(f'SELECT track_id, {", ".join("`"+col+"`" if col == "key" else col for col in audio_cols)} FROM song WHERE track_id NOT IN ({", ".join(playlist_quoted)})')
-        
-        print(sql_user_playlist)
-        session = db.session()
-        try:
-            cursor = session.execute(sql_user_playlist).cursor
-            user_playlist_audio_feats = cursor.fetchall()
-            cursor = session.execute(sql_all_audio_feats).cursor
-            all_audio_feats = cursor.fetchall()
-            print('%'*50)
-            print(f'ALL AUDIO FEATURES: {len(all_audio_feats)} ')
-            print(user_playlist_audio_feats)
-            print('%'*50)
-            for row in all_audio_feats:
-                row = [float(x) if isinstance(x, Decimal) or isinstance(x, int) else x for x in row]
-                master_audio_feats.append(row)
-
-            for row in user_playlist_audio_feats:
-                print(type(row))
-                row = list(row)
-                row = [float(x) if isinstance(x, Decimal) or isinstance(x, int) else x for x in row]
-                print(type(row))
-                print(row)
-                input_seq.append(row)
-        except Exception as e:
-            print("Error executing query:", e)
-            session.rollback()
-        finally:
-            session.close()
-        
-        print('^'*50)
-        print(input_seq)
-        print(len(input_seq))
-        print('^'*50)
-
-        # Converting input sequence into a 3D numpy array required for RNN model
-        np_input_seq = np.array(input_seq)
-        three_dim_input_seq = np.reshape(np_input_seq, (1, len(input_seq), 12))
-        print(f'Three dimensional input sequence: {three_dim_input_seq}')
-
-        # Pad the playlist to the optimal dimensions of (1, 35, 12)
-        padded_playlist = pad_and_reshape(three_dim_input_seq)
-        print(padded_playlist.shape)
-
-        predictions = model.predict(padded_playlist)
-        print('@'*50)
-        print(predictions)
-        print('@'*50)
-
-        master_audio_feats = np.array(master_audio_feats)
-        master_audio_feats[:, 1:].astype(np.float32)
-        
-        
-        # calculate the cosine similarity between the input array and each row of the larger array
-        cosine_similarites = np.apply_along_axis(lambda x: 1 - cosine(predictions, x), 1, master_audio_feats[:, 1:].astype(np.float32))
-        most_similar_index = np.argsort(cosine_similarites[::-1][:5])
-        print(f"Most similar row index(es): {most_similar_index}")
-        
-        for i in range(len(master_audio_feats)):
-            if i in most_similar_index:
-                recommended_track_ids.append(master_audio_feats[i, 0])
-        
-        print(recommended_track_ids)
-
-        recommended_track_ids = [f"'{elem}'" for elem in recommended_track_ids]
-        sql_recommended_track_ids = text(f'SELECT track_id, track_name, track_artist, track_album_name FROM song WHERE track_id IN ({", ".join(recommended_track_ids)})')
-
-        try:
-            cursor = session.execute(sql_recommended_track_ids).cursor
-            recommended_tracks = cursor.fetchall()
-        except Exception as e:
-            print("Error executing query:", e)
-            session.rollback()
-        finally:
-            session.close()
-        print(type(recommended_tracks))
-        recommended_tracks = list(recommended_tracks)
-        print(recommended_tracks)
-
-    return render_template("home.html", user=current_user, recommended_tracks=recommended_tracks)
+   
+    return render_template("home.html", user=current_user)
 
 @views.route('/songs', methods=['GET', 'POST'])
 def display_songs():
-    songs = Song.query
+    songs = Billboard.query
     return render_template('songs.html', songs=songs, user=current_user)
 
 #This method will allow the user to add new songs
