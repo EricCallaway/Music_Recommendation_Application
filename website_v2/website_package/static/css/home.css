@@ -1,0 +1,14 @@
+tr:hover {background-color:greenyellow}
+
+.container{
+    display: flex;
+    flex-direction: row;
+}
+.column {
+    flex: 1;
+    padding: 20px;
+}
+
+#recommended-songs caption {
+    caption-side: top;
+}

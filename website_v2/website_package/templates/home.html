@@ -1,25 +1,11 @@
 {% extends "base.html" %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{url_for('static', filename='css/home.css')}}">
+{% endblock %}
 {% block title %}Home{% endblock %}
 
 {% block content %}
 <center><h1>Music Recommendation Project</h1></center>
-
-<style>
-    tr:hover {background-color:greenyellow}
-
-    .container{
-        display: flex;
-        flex-direction: row;
-    }
-    .column {
-        flex: 1;
-        padding: 20px;
-    }
-
-    #recommended-songs caption {
-        caption-side: top;
-    }
-</style>
 
 <div class="container">
     <div class="column">
