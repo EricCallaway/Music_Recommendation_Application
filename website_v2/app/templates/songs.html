@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{url_for('static', filename='css/songs.css')}}">
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript" src="{{ url_for('static', filename='scripts/songs.js') }}"></script>
+{% endblock %}
+
+{% block title %}Songs{% endblock %}
+
+{% block content %}
+    <h1>Songs</h1>
+   
+    <table id="song_data" class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Title</th>
+                <th>Artist</th>
+                <th>Spotify Link</th>
+                <th>Spotify ID</th>
+                <th>Genre</th>
+                <th>Analysis URL Name</th>
+                <th>Energy</th>
+                <th>Liveness</th>
+                <th>Tempo</th>
+                <th>Speechiness</th>
+                <th>Acousticness</th>
+                <th>Instrumentalness</th>
+                <th>Time Signature</th>
+                <th>Danceability</th>
+                <th>Key</th>
+                <th>Duration (ms)</th>
+                <th>Loudness</th>
+                <th>Valence</th>
+                <th>Mode</th>
+                <th>Lyrics</th>
+                <th>Clean Lyrics</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+{% endblock %}

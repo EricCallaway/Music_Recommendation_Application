@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tf_idf.css') }}">
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript" src="{{ url_for('static', filename='scripts/tf_idf.js') }}"></script>
+{% endblock %}
+{% block title %}TF-IDF Recommendation{% endblock %}
+
+{% block content %}
+<center><h1>TF-IDF Recommendation System 😎</h1></center>
+
+<table id="billboard_songs" class="table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Title</th>
+            <th>Artist</th>
+            <th>Spotify Link</th>
+            <th>Spotify ID</th>
+            <th>Genre</th>
+            <th>Analysis URL Name</th>
+            <th>Energy</th>
+            <th>Liveness</th>
+            <th>Tempo</th>
+            <th>Speechiness</th>
+            <th>Acousticness</th>
+            <th>Instrumentalness</th>
+            <th>Time Signature</th>
+            <th>Danceability</th>
+            <th>Key</th>
+            <th>Duration (ms)</th>
+            <th>Loudness</th>
+            <th>Valence</th>
+            <th>Mode</th>
+            <th>Lyrics</th>
+            <th>Clean Lyrics</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+
+</table>
+
+<form method="post">
+    <button type="submit" onclick="save_playlist()">Save</button>
+    <table id="selected-songs" name="selected-songs" class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Artist</th>
+                <th>Spotify Link</th>
+                <th>Spotify ID</th>
+            </tr>
+        </thead>
+        <tbody>
+            <caption><strong>Selected Songs</strong></caption>
+        </tbody>
+    </table>
+</form>
+
+
+<table id="recommended-songs" name="recommended-songs" class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Artist</th>
+            <th>Spotify Link</th>
+            <th>Spotify ID</th>
+        </tr>
+    </thead>
+    <tbody>
+        <caption><strong>Recommended Songs</strong></caption>
+        {% for song in recommended_songs %}
+        <tr>
+            <td>{{song[0]}}</td>
+            <td>{{song[1]}}</td>
+            <td>{{song[2]}}</td>
+            <td>{{song[3]}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
